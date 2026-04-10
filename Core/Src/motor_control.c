@@ -3,8 +3,9 @@
  * @brief     Implementation of DC motors controls
  */
 
-#include "motor_control.h"
-#include <stdint.h>
+#include "../Inc/motor_control.h"
+
+include <stdint.h>
 
 /* Base addresses */
 
