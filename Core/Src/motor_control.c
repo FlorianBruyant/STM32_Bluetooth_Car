@@ -5,7 +5,7 @@
 
 #include "../Inc/motor_control.h"
 
-include <stdint.h>
+#include <stdint.h>
 
 /* Base addresses */
 

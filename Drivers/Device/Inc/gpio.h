@@ -8,7 +8,7 @@
 #ifndef DRIVERS_GPIO_H_
 #define DRIVERS_GPIO_H_
 
-#include "CMSIS/stm32f411xe.h"
+#include "../CMSIS/stm32f411xe.h"
 
 /**
  * @brief  Initializes the GPIOx peripheral according to the specified parameters.
