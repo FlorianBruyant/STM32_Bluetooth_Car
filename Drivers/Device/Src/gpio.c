@@ -60,3 +60,16 @@ GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint8_t pin){
 		return GPIO_PIN_RESET;
 	}
 }
+
+void GPIO_SelectAltFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t alt_func){
+	// Mask to disable modification of the upper 4 bits
+	alt_func &= 0xFU;
+
+	if(pin <= 7){
+		port->AFR[0] &= ~(0xFUL << (pin*4U));
+		port->AFR[0] |= ((uint32_t)alt_func << (pin*4U));
+	}else{
+		port->AFR[1] &= ~(0xFUL << ((pin-8U)*4U));
+		port->AFR[1] |= ((uint32_t)alt_func << ((pin-8U)*4U));
+	}
+}

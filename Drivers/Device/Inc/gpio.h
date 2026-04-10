@@ -97,4 +97,13 @@ void GPIO_WritePin(GPIO_TypeDef* port,
  */
 GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint8_t pin);
 
+/**
+ * @brief  Configures the alternate function (AF) for a specific GPIO pin.
+ * @param  port:     Pointer to GPIOx peripheral base address (e.g., GPIOA, GPIOB).
+ * @param  pin:      Specifies the port pin to be configured (0 to 15).
+ * @param  alt_func: Specifies the alternate function selection (0 to 15).
+ * @retval None
+ */
+void GPIO_SelectAltFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t alt_func);
+
 #endif /* DRIVERS_GPIO_H_ */
