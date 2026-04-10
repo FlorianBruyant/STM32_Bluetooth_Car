@@ -44,13 +44,19 @@ void GPIO_Init(GPIO_TypeDef* port,
 	port->PUPDR |= (pullUpDown << (pin*2U));
 }
 
-void GPIO_WritePin(GPIO_TypeDef* port,
-		uint32_t pin,
-		uint32_t value){
+void GPIO_WritePin(GPIO_TypeDef* port, uint32_t pin, uint32_t value){
 	// Sets the bit (1U) or resets
 	if(value == 1U){
 		port->BSRR |= (1UL << pin);
 	} else{
 		port->BSRR |= (1UL << (pin+16U));
+	}
+}
+
+GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint32_t pin){
+	if((port->IDR & (1UL << pin)) != 0U){
+		return GPIO_PIN_SET;
+	}else{
+		return GPIO_PIN_RESET;
 	}
 }

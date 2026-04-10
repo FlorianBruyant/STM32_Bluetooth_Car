@@ -88,4 +88,13 @@ void GPIO_WritePin(GPIO_TypeDef* port,
 		uint32_t        pin,
 		GPIO_PinState_t value);
 
+/**
+ * @brief  Reads the specified input port pin.
+ * @param  port: Pointer to GPIOx peripheral base address (e.g., GPIOA, GPIOB).
+ * @param  pin:  Specifies the port pin to read (0 to 15).
+ * @retval The input port pin value.
+ * This return value is a member of @ref GPIO_PinState_t.
+ */
+GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint32_t pin);
+
 #endif /* DRIVERS_GPIO_H_ */
