@@ -26,6 +26,17 @@ void GPIO_Init(GPIO_TypeDef* port,
 		uint32_t outputSpeed,
 		uint32_t pullUpDown);
 
-
+/**
+ * @brief  Sets or clears the selected data port pin, using the BSSR.
+ * @param  port:  Pointer to GPIOx peripheral base address (e.g., GPIOA, GPIOB).
+ * @param  pin:   Specifies the port pin to be written (0 to 15).
+ * @param  value: Specifies the value to be written to the selected pin.
+ * This parameter can be one of the following:
+ * @arg 0: to clear the pin (Logic Low)
+ * @arg 1: to set the pin (Logic High)
+ */
+void GPIO_WritePin(GPIO_TypeDef* port,
+		uint32_t pin,
+		uint32_t value);
 
 #endif /* DRIVERS_GPIO_H_ */
