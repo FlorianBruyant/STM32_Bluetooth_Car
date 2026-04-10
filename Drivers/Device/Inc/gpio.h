@@ -20,10 +20,12 @@
  * @param  pullUpDown: Specifies the Pull-up or Pull-down activation for the selected pin.
  */
 void GPIO_Init(GPIO_TypeDef* port,
-		uint8_t pin,
-		uint8_t mode,
-		uint8_t outputType,
-		uint8_t outputSpeed,
-		uint8_t pullUpDown);
+		uint32_t pin,
+		uint32_t mode,
+		uint32_t outputType,
+		uint32_t outputSpeed,
+		uint32_t pullUpDown);
+
+
 
 #endif /* DRIVERS_GPIO_H_ */
