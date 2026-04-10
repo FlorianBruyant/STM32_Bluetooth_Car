@@ -11,32 +11,81 @@
 #include "../CMSIS/stm32f411xe.h"
 
 /**
- * @brief  Initializes the GPIOx peripheral according to the specified parameters.
- * @param  port:       Pointer to GPIOx peripheral base address (e.g., GPIOA, GPIOB).
- * @param  pin:        Specifies the port pin to be configured (0 to 15).
- * @param  mode:       Operating mode for the selected pin (Input, Output, Alternate, Analog).
- * @param  outputType: Operating output type for the selected pin (Push-pull or Open-drain).
- * @param  outputSpeed: Specifies the speed for the selected pin (Low, Medium, Fast, High).
- * @param  pullUpDown: Specifies the Pull-up or Pull-down activation for the selected pin.
+ * @brief GPIO Pin Mode (MODER register)
  */
-void GPIO_Init(GPIO_TypeDef* port,
-		uint32_t pin,
-		uint32_t mode,
-		uint32_t outputType,
-		uint32_t outputSpeed,
-		uint32_t pullUpDown);
+typedef enum {
+    GPIO_MODE_INPUT     = 0x00U,
+    GPIO_MODE_OUTPUT    = 0x01U,
+    GPIO_MODE_ALTERNATE = 0x02U,
+    GPIO_MODE_ANALOG    = 0x03U
+} GPIO_Mode_t;
 
 /**
- * @brief  Sets or clears the selected data port pin, using the BSSR.
+ * @brief GPIO Output Type (OTYPER register)
+ */
+typedef enum {
+    GPIO_OTYPE_PUSHPULL  = 0x00U,
+    GPIO_OTYPE_OPENDRAIN = 0x01U
+} GPIO_OType_t;
+
+/**
+ * @brief GPIO Output Speed (OSPEEDR register)
+ */
+typedef enum {
+    GPIO_SPEED_LOW       = 0x00U,
+    GPIO_SPEED_MEDIUM    = 0x01U,
+    GPIO_SPEED_FAST      = 0x02U,
+    GPIO_SPEED_HIGH      = 0x03U
+} GPIO_Speed_t;
+
+/**
+ * @brief GPIO Pull-up/Pull-down (PUPDR register)
+ */
+typedef enum {
+    GPIO_PULL_NONE       = 0x00U,
+    GPIO_PULL_UP         = 0x01U,
+    GPIO_PULL_DOWN       = 0x02U
+} GPIO_Pull_t;
+
+/**
+ * @brief GPIO Pin State
+ */
+typedef enum {
+    GPIO_PIN_RESET = 0U,
+    GPIO_PIN_SET   = 1U
+} GPIO_PinState_t;
+
+/**
+ * @brief  Initializes the GPIOx peripheral according to the specified parameters.
+ * @param  port:        Pointer to GPIOx peripheral base address (e.g., GPIOA, GPIOB).
+ * @param  pin:         Specifies the port pin to be configured (0 to 15).
+ * @param  mode:        Operating mode for the selected pin.
+ * This parameter must be a value of @ref GPIO_Mode_t.
+ * @param  outputType:  Operating output type for the selected pin.
+ * This parameter must be a value of @ref GPIO_OType_t.
+ * @param  outputSpeed: Specifies the speed for the selected pin.
+ * This parameter must be a value of @ref GPIO_Speed_t.
+ * @param  pullUpDown:  Specifies the Pull-up or Pull-down activation for the selected pin.
+ * This parameter must be a value of @ref GPIO_Pull_t.
+ * @retval None
+ */
+void GPIO_Init(GPIO_TypeDef* port,
+		uint32_t     pin,
+		GPIO_Mode_t  mode,
+		GPIO_OType_t outputType,
+		GPIO_Speed_t outputSpeed,
+		GPIO_Pull_t  pullUpDown);
+
+/**
+ * @brief  Sets or clears the selected data port pin using the BSRR register.
  * @param  port:  Pointer to GPIOx peripheral base address (e.g., GPIOA, GPIOB).
  * @param  pin:   Specifies the port pin to be written (0 to 15).
  * @param  value: Specifies the value to be written to the selected pin.
- * This parameter can be one of the following:
- * @arg 0: to clear the pin (Logic Low)
- * @arg 1: to set the pin (Logic High)
+ * This parameter must be a value of @ref GPIO_PinState_t.
+ * @retval None
  */
 void GPIO_WritePin(GPIO_TypeDef* port,
-		uint32_t pin,
-		uint32_t value);
+		uint32_t        pin,
+		GPIO_PinState_t value);
 
 #endif /* DRIVERS_GPIO_H_ */
