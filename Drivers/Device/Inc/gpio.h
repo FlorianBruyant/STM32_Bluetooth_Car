@@ -70,7 +70,7 @@ typedef enum {
  * @retval None
  */
 void GPIO_Init(GPIO_TypeDef* port,
-		uint32_t     pin,
+		uint8_t     pin,
 		GPIO_Mode_t  mode,
 		GPIO_OType_t outputType,
 		GPIO_Speed_t outputSpeed,
@@ -85,7 +85,7 @@ void GPIO_Init(GPIO_TypeDef* port,
  * @retval None
  */
 void GPIO_WritePin(GPIO_TypeDef* port,
-		uint32_t        pin,
+		uint8_t        pin,
 		GPIO_PinState_t value);
 
 /**
@@ -95,6 +95,6 @@ void GPIO_WritePin(GPIO_TypeDef* port,
  * @retval The input port pin value.
  * This return value is a member of @ref GPIO_PinState_t.
  */
-GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint32_t pin);
+GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint8_t pin);
 
 #endif /* DRIVERS_GPIO_H_ */
