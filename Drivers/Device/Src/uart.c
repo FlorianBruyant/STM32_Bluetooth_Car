@@ -57,7 +57,7 @@ void USART1_IRQHandler(void){
 		// Check if the buffer is not empty
 		if (next_head != rx_tail)
 		{
-			rx_buffer[rx_head] = byte;
+			rx_buffer[rx_head] = data;
 			rx_head = next_head;
 		}
 		// TODO : increment error counter if buffer is full
