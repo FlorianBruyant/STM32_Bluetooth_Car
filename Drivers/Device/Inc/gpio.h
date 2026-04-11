@@ -5,10 +5,13 @@
  *      Author: Florian Bruyant
  */
 
-#ifndef DRIVERS_GPIO_H_
-#define DRIVERS_GPIO_H_
+#ifndef GPIO_H_
+#define GPIO_H_
 
 #include "../CMSIS/stm32f411xe.h"
+
+/* Alternate function mapping */
+#define GPIO_AF_USART1 7U
 
 /**
  * @brief GPIO Pin Mode (MODER register)
@@ -106,4 +109,4 @@ GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint8_t pin);
  */
 void GPIO_SelectAltFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t alt_func);
 
-#endif /* DRIVERS_GPIO_H_ */
+#endif /* GPIO_H_ */
