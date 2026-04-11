@@ -70,7 +70,6 @@ typedef enum {
  * This parameter must be a value of @ref GPIO_Speed_t.
  * @param  pullUpDown:  Specifies the Pull-up or Pull-down activation for the selected pin.
  * This parameter must be a value of @ref GPIO_Pull_t.
- * @retval None
  */
 void GPIO_Init(GPIO_TypeDef* port,
 		uint8_t     pin,
@@ -85,7 +84,6 @@ void GPIO_Init(GPIO_TypeDef* port,
  * @param  pin:   Specifies the port pin to be written (0 to 15).
  * @param  value: Specifies the value to be written to the selected pin.
  * This parameter must be a value of @ref GPIO_PinState_t.
- * @retval None
  */
 void GPIO_WritePin(GPIO_TypeDef* port,
 		uint8_t        pin,
@@ -95,7 +93,7 @@ void GPIO_WritePin(GPIO_TypeDef* port,
  * @brief  Reads the specified input port pin.
  * @param  port: Pointer to GPIOx peripheral base address (e.g., GPIOA, GPIOB).
  * @param  pin:  Specifies the port pin to read (0 to 15).
- * @retval The input port pin value.
+ * @return The input port pin value.
  * This return value is a member of @ref GPIO_PinState_t.
  */
 GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint8_t pin);
@@ -105,7 +103,6 @@ GPIO_PinState_t GPIO_ReadPin(GPIO_TypeDef* port, uint8_t pin);
  * @param  port:     Pointer to GPIOx peripheral base address (e.g., GPIOA, GPIOB).
  * @param  pin:      Specifies the port pin to be configured (0 to 15).
  * @param  alt_func: Specifies the alternate function selection (0 to 15).
- * @retval None
  */
 void GPIO_SelectAltFunc(GPIO_TypeDef* port, uint8_t pin, uint8_t alt_func);
 
