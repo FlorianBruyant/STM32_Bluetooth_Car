@@ -7,7 +7,11 @@
 
 #include "uart.h"
 
-void UART_Init(){
+static volatile uint8_t  rx_buffer[UART_RX_BUFFER_SIZE];
+static volatile uint32_t rx_head = 0U;
+static volatile uint32_t rx_tail = 0U;
+
+void UART_Init(void){
 	// Init clocks for GPIOA and USART1
 	RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
 	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
@@ -28,5 +32,26 @@ void UART_Init(){
 
 	USART1->CR1 |= USART_CR1_TE      // Transmitter enable
 				|  USART_CR1_RE      // Receiver enable
+				|  USART_CR1_RXNEIE  // IRQ when RX not empty
 				|  USART_CR1_UE;
+
+	// Activate USART1 interrupt
+	NVIC_EnableIRQ(USART1_IRQn);
+}
+
+void USART1_IRQHandler(void){
+	if(USART1->SR & USART_SR_RXNE){
+		// Only the first 8 bits are used, the rest are reserved
+		uint8_t data = (uint8_t)(USART1->DR & 0xFFU);
+
+		uint32_t next_head = (rx_head + 1U) % UART_RX_BUFFER_SIZE;
+
+		// Check if the buffer is not empty
+		if (next_head != rx_tail)
+		{
+			rx_buffer[rx_head] = byte;
+			rx_head = next_head;
+		}
+		// TODO : increment error counter if buffer is full
+	}
 }
