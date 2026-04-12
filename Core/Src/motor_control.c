@@ -100,11 +100,45 @@ void motor_SetSpeed(uint8_t speed)
  */
 void motor_Forward(uint8_t speed)
 {
-    Motor_SetSpeed(speed);
+    motor_SetSpeed(speed);
     // Set left to forward
     GPIO_WritePin(GPIOA, IN1_PIN, GPIO_PIN_SET);
     GPIO_WritePin(GPIOA, IN2_PIN, GPIO_PIN_RESET);
     // Set right to forward
     GPIO_WritePin(GPIOA, IN3_PIN, GPIO_PIN_SET);
     GPIO_WritePin(GPIOB, IN4_PIN, GPIO_PIN_RESET);
+}
+
+
+void motor_Backward(uint8_t speed)
+{
+    motor_SetSpeed(speed);
+    // Set left to backward
+    GPIO_WritePin(GPIOA, IN1_PIN, GPIO_PIN_RESET);
+    GPIO_WritePin(GPIOA, IN2_PIN, GPIO_PIN_SET);
+    // Set right to backward
+	GPIO_WritePin(GPIOA, IN3_PIN, GPIO_PIN_RESET);
+	GPIO_WritePin(GPIOB, IN4_PIN, GPIO_PIN_SET);
+}
+
+void motor_TurnLeft(uint8_t speed)
+{
+    motor_SetSpeed(speed);
+    // Set left to backward
+	GPIO_WritePin(GPIOA, IN1_PIN, GPIO_PIN_RESET);
+	GPIO_WritePin(GPIOA, IN2_PIN, GPIO_PIN_SET);
+	// Set right to forward
+	GPIO_WritePin(GPIOA, IN3_PIN, GPIO_PIN_SET);
+	GPIO_WritePin(GPIOB, IN4_PIN, GPIO_PIN_RESET);
+}
+
+void motor_TurnRight(uint8_t speed)
+{
+    motor_SetSpeed(speed);
+    // Set left to forward
+	GPIO_WritePin(GPIOA, IN1_PIN, GPIO_PIN_SET);
+	GPIO_WritePin(GPIOA, IN2_PIN, GPIO_PIN_RESET);
+	// Set right to backward
+	GPIO_WritePin(GPIOA, IN3_PIN, GPIO_PIN_RESET);
+	GPIO_WritePin(GPIOB, IN4_PIN, GPIO_PIN_SET);
 }
