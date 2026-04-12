@@ -70,9 +70,6 @@ void Motor_Init(void)
 
     // Start the timer
     TIM3->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN;
-
-    // Set all direction pins LOW (initial state)
-    Motor_Stop();
 }
 
 void Motor_SetSpeedLeft(uint8_t speed)
@@ -90,50 +87,4 @@ void Motor_SetSpeed(uint8_t speed)
     uint32_t ccr = percent_to_ccr(speed);
     TIM3->CCR1 = ccr;
     TIM3->CCR2 = ccr;
-}
-
-/**
- *  L298N logic :
- *    INx=1, INy=0 : forward
- *    INx=0, INy=1 : backward
- *    INx=0, INy=0 : stop motors
- */
-void Motor_Forward(uint8_t speed)
-{
-    Motor_SetSpeed(speed);
-    PIN_HIGH(GPIOA, IN1_PIN); PIN_LOW(GPIOA, IN2_PIN);  /* Left  → fwd */
-    PIN_HIGH(GPIOA, IN3_PIN); PIN_LOW(GPIOB, IN4_PIN);  /* Right → fwd */
-}
-
-void Motor_Backward(uint8_t speed)
-{
-    Motor_SetSpeed(speed);
-    PIN_LOW(GPIOA, IN1_PIN); PIN_HIGH(GPIOA, IN2_PIN);  /* Left  → bwd */
-    PIN_LOW(GPIOA, IN3_PIN); PIN_HIGH(GPIOB, IN4_PIN);  /* Right → bwd */
-}
-
-void Motor_TurnLeft(uint8_t speed)
-{
-    Motor_SetSpeed(speed);
-    PIN_LOW(GPIOA, IN1_PIN);  PIN_HIGH(GPIOA, IN2_PIN); /* Left  → bwd */
-    PIN_HIGH(GPIOA, IN3_PIN); PIN_LOW(GPIOB, IN4_PIN);  /* Right → fwd */
-}
-
-void Motor_TurnRight(uint8_t speed)
-{
-    Motor_SetSpeed(speed);
-    PIN_HIGH(GPIOA, IN1_PIN); PIN_LOW(GPIOA, IN2_PIN);  /* Left  → fwd */
-    PIN_LOW(GPIOA, IN3_PIN);  PIN_HIGH(GPIOB, IN4_PIN); /* Right → bwd */
-}
-
-void Motor_Stop(void)
-{
-    /* Set CCR to 0 first to avoid a brief full-speed glitch
-     * before the direction pins reach LOW state */
-    TIM3->CCR1 = 0U;
-    TIM3->CCR2 = 0U;
-    PIN_LOW(GPIOA, IN1_PIN);
-    PIN_LOW(GPIOA, IN2_PIN);
-    PIN_LOW(GPIOA, IN3_PIN);
-    PIN_LOW(GPIOB, IN4_PIN);
 }
