@@ -142,3 +142,13 @@ void motor_TurnRight(uint8_t speed)
 	GPIO_WritePin(GPIOA, IN3_PIN, GPIO_PIN_RESET);
 	GPIO_WritePin(GPIOB, IN4_PIN, GPIO_PIN_SET);
 }
+
+
+void motor_Stop(void)
+{
+	// Set all pins to reset
+	GPIO_WritePin(GPIOA, IN1_PIN, GPIO_PIN_RESET);
+	GPIO_WritePin(GPIOA, IN2_PIN, GPIO_PIN_RESET);
+	GPIO_WritePin(GPIOA, IN3_PIN, GPIO_PIN_RESET);
+	GPIO_WritePin(GPIOB, IN4_PIN, GPIO_PIN_RESET);
+}
