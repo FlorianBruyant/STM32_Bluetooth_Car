@@ -54,3 +54,4 @@ dkms.conf
 # debug information files
 *.dwo
 /Debug/
+/STM32_Bluetooth_Car Debug.launch

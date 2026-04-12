@@ -17,13 +17,70 @@
  */
 
 #include <stdint.h>
+#include "stm32f411xe.h"
+#include "motor_control.h"
+#include "uart.h"
+#include "protocol.h"
+#include "timer.h"
 
-#if !defined(__SOFT_FP__) && defined(__ARM_FP)
-  #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
-#endif
+/* Configuration */
+
+// Default driving speed when no speed is specified (in percentage)
+#define DEFAULT_SPEED 70U
+
+// Watchdog timeout : motors stop if no command received (in ms)
+#define WATCHDOG_MS 500U
+
+// Protocol frame size : 1 direction byte + 2 speed digits
+#define FRAME_SIZE 3U
+
+uint32_t SystemCoreClock = 16000000U;
+
+/**
+ *  Watchdog
+ *
+ *  Called every main loop iteration.
+ *  Stops the motors if no valid command has been received
+ *  within WATCHDOG_MS milliseconds.
+ */
+static void watchdog_check(uint32_t last_cmd_tick)
+{
+    if ((timer_GetTick() - last_cmd_tick) >= WATCHDOG_MS)
+    {
+        motor_Stop();
+    }
+}
 
 int main(void)
 {
-    /* Loop forever */
-	for(;;);
+    /* Initialize peripherals */
+	timer_Init();
+    motor_Init();
+    UART_Init();
+
+    /* Safe initial state */
+    motor_Stop();
+
+    /* Brief delay to let HC-05 finish its startup sequence
+     * (HC-05 takes ~300ms to initialize after power-on) */
+    timer_DelayMs(500U);
+
+    /* Send startup message — visible in a serial terminal app */
+    UART_SendString("CAR READY\r\n");
+    UART_SendString("Protocol: DIR(F/B/L/R/S) + SPEED(00-99)\r\n");
+    UART_SendString("Example : F75 = Forward 75%\r\n");
+
+    /* Watchdog timestamp — initialized to now so the car does
+     * not stop immediately before the first command arrives */
+    uint32_t last_cmd_tick = timer_GetTick();
+
+    /* Main loop */
+    while (1)
+    {
+        /* 1. Process all pending bytes from the RX buffer */
+        protocol_ProcessRx(&last_cmd_tick);
+
+        /* 2. Check watchdog */
+        watchdog_check(last_cmd_tick);
+    }
 }
