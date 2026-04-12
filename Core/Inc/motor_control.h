@@ -32,54 +32,54 @@
  *         TIM3 PWM outputs (ENA on PB4, ENB on PB5).
  *         Motors start stopped at 0% duty cycle.
  */
-void Motor_Init(void);
+void motor_Init(void);
 
 /**
  * @brief  Set left motor speed.
  * @param  speed  Duty cycle percentage, clamped to [0, 100].
  */
-void Motor_SetSpeedLeft(uint8_t speed);
+void motor_SetSpeedLeft(uint8_t speed);
 
 /**
  * @brief  Set right motor speed.
  * @param  speed  Duty cycle percentage, clamped to [0, 100].
  */
-void Motor_SetSpeedRight(uint8_t speed);
+void motor_SetSpeedRight(uint8_t speed);
 
 /**
  * @brief  Set both motors to the same speed.
  * @param  speed  Duty cycle percentage, clamped to [0, 100].
  */
-void Motor_SetSpeed(uint8_t speed);
+void motor_SetSpeed(uint8_t speed);
 
 /**
  * @brief  Drive both motors forward at given speed.
  * @param  speed  Duty cycle percentage, clamped to [0, 100].
  */
-void Motor_Forward(uint8_t speed);
+void motor_Forward(uint8_t speed);
 
 /**
  * @brief  Drive both motors backward at given speed.
  * @param  speed  Duty cycle percentage, clamped to [0, 100].
  */
-void Motor_Backward(uint8_t speed);
+void motor_Backward(uint8_t speed);
 
 /**
  * @brief  Spin left : left motor backward, right motor forward.
  * @param  speed  Duty cycle percentage, clamped to [0, 100].
  */
-void Motor_TurnLeft(uint8_t speed);
+void motor_TurnLeft(uint8_t speed);
 
 /**
  * @brief  Spin right : left motor forward, right motor backward.
  * @param  speed  Duty cycle percentage, clamped to [0, 100].
  */
-void Motor_TurnRight(uint8_t speed);
+void motor_TurnRight(uint8_t speed);
 
 /**
  * @brief  Stop both motors (free wheel).
  *         PWM duty cycle is set to 0 before releasing direction pins.
  */
-void Motor_Stop(void);
+void motor_Stop(void);
 
 #endif /* MOTOR_CONTROL_H_ */

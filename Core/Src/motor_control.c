@@ -16,7 +16,7 @@ static uint32_t percent_to_ccr(uint8_t speed)
     return ((uint32_t)speed * PWM_ARR) / 100U;
 }
 
-void Motor_Init(void)
+void motor_Init(void)
 {
     // Enable clocks for GPIOA and B and TIM3
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN;
@@ -72,20 +72,20 @@ void Motor_Init(void)
     TIM3->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN;
 
     // Set all direction pins LOW (initial state)
-    Motor_Stop();
+    motor_Stop();
 }
 
-void Motor_SetSpeedLeft(uint8_t speed)
+void motor_SetSpeedLeft(uint8_t speed)
 {
     TIM3->CCR1 = percent_to_ccr(speed);
 }
 
-void Motor_SetSpeedRight(uint8_t speed)
+void motor_SetSpeedRight(uint8_t speed)
 {
     TIM3->CCR2 = percent_to_ccr(speed);
 }
 
-void Motor_SetSpeed(uint8_t speed)
+void motor_SetSpeed(uint8_t speed)
 {
     uint32_t ccr = percent_to_ccr(speed);
     TIM3->CCR1 = ccr;
@@ -98,7 +98,7 @@ void Motor_SetSpeed(uint8_t speed)
  *    INx=0, INy=1 : backward
  *    INx=0, INy=0 : stop motors
  */
-void Motor_Forward(uint8_t speed)
+void motor_Forward(uint8_t speed)
 {
     Motor_SetSpeed(speed);
     // Set left to forward
