@@ -12,6 +12,7 @@
 
 /* Alternate function mapping */
 #define GPIO_AF_USART1 7U
+#define GPIO_AF_TIM3 2U
 
 /**
  * @brief GPIO Pin Mode (MODER register)
