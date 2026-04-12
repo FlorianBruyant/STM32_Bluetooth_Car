@@ -4,25 +4,136 @@
  */
 
 #include "../Inc/motor_control.h"
+#include "../../Drivers/Device/Inc/gpio.h"
 
-#include <stdint.h>
+/**
+ *  Private function for converting percentage to CCR value
+ *  Clamps input to [0, 100] to prevent overflow.
+ */
+static uint32_t percent_to_ccr(uint8_t speed)
+{
+    if (speed >= 100U) return PWM_ARR;
+    return ((uint32_t)speed * PWM_ARR) / 100U;
+}
 
-/* Base addresses */
+void Motor_Init(void)
+{
+    // Enable clocks for GPIOA and B and TIM3
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN;
+    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
 
-// Base address of the clock control block
-#define RCC_BASE 0x40023800U
+    // Configure direction pins
+    GPIO_Init(GPIOA, IN1_PIN, GPIO_MODE_OUTPUT, GPIO_OTYPE_PUSHPULL,
+              GPIO_SPEED_LOW, GPIO_PULL_NONE);
+    GPIO_Init(GPIOA, IN2_PIN, GPIO_MODE_OUTPUT, GPIO_OTYPE_PUSHPULL,
+              GPIO_SPEED_LOW, GPIO_PULL_NONE);
+    GPIO_Init(GPIOA, IN3_PIN, GPIO_MODE_OUTPUT, GPIO_OTYPE_PUSHPULL,
+              GPIO_SPEED_LOW, GPIO_PULL_NONE);
+    GPIO_Init(GPIOB, IN4_PIN, GPIO_MODE_OUTPUT, GPIO_OTYPE_PUSHPULL,
+              GPIO_SPEED_LOW, GPIO_PULL_NONE);
 
-// Clock register to turn GPIO on or off
-#define RCC_AHB1ENR (*(volatile uint32_t *)(RCC_BASE + 0x30U))
+    // Configure pins connected to ENA and ENB to be used for PWM
+    GPIO_Init(GPIOB, ENA_PIN, GPIO_MODE_ALTERNATE, GPIO_OTYPE_PUSHPULL,
+              GPIO_SPEED_HIGH, GPIO_PULL_NONE);
+    GPIO_SelectAltFunc(GPIOB, ENA_PIN, GPIO_AF_TIM3);
 
-// Base addresses for GPIO A and B ports
-#define GPIOA_BASE 0x40020000U
-#define GPIOB_BASE 0x40020400U
+    GPIO_Init(GPIOB, ENB_PIN, GPIO_MODE_ALTERNATE, GPIO_OTYPE_PUSHPULL,
+              GPIO_SPEED_HIGH, GPIO_PULL_NONE);
+    GPIO_SelectAltFunc(GPIOB, ENB_PIN, GPIO_AF_TIM3);
 
-// GPIOA MODER and BSSR
-#define GPIOA_MODER   (*(volatile uint32_t *)(GPIOA_BASE + 0x00U))
-#define GPIOA_BSRR    (*(volatile uint32_t *)(GPIOA_BASE + 0x18U))
+    /* Configure TIM3 for PWM */
 
-// GPIOB MODER and BSSR
-#define GPIOB_MODER   (*(volatile uint32_t *)(GPIOB_BASE + 0x00U))
-#define GPIOB_BSRR    (*(volatile uint32_t *)(GPIOB_BASE + 0x18U))
+    // Set prescaler and auto reload with values defined in .h
+    TIM3->PSC = PWM_PSC;
+    TIM3->ARR = PWM_ARR;
+
+    // Configure CH1 and CH2 in PWM mode 1
+    TIM3->CCMR1 = 0U;   // Reset before writing
+    TIM3->CCMR1 |= (6U << TIM_CCMR1_OC1M_Pos)   // CH1 PWM mode 1
+                |  TIM_CCMR1_OC1PE              // CH1 preload
+                |  (6U << TIM_CCMR1_OC2M_Pos)   // CH2 PWM mode 1
+                |  TIM_CCMR1_OC2PE;             // CH2 preload
+
+    /* Enable channel outputs
+     * CCER register enables the output on the physical pin :
+     *   CC1E : CH1 output enable : activates PB4
+     *   CC2E : CH2 output enable : activates PB5
+     */
+    TIM3->CCER |= TIM_CCER_CC1E | TIM_CCER_CC2E;
+
+    /* 4d. Initialize CCR to 0 (motors stopped) */
+    TIM3->CCR1 = 0U;
+    TIM3->CCR2 = 0U;
+
+    // Generate an Update Event to load PSC and ARR immediately
+    TIM3->EGR |= TIM_EGR_UG;
+
+    // Start the timer
+    TIM3->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN;
+
+    // Set all direction pins LOW (initial state)
+    Motor_Stop();
+}
+
+void Motor_SetSpeedLeft(uint8_t speed)
+{
+    TIM3->CCR1 = percent_to_ccr(speed);
+}
+
+void Motor_SetSpeedRight(uint8_t speed)
+{
+    TIM3->CCR2 = percent_to_ccr(speed);
+}
+
+void Motor_SetSpeed(uint8_t speed)
+{
+    uint32_t ccr = percent_to_ccr(speed);
+    TIM3->CCR1 = ccr;
+    TIM3->CCR2 = ccr;
+}
+
+/**
+ *  L298N logic :
+ *    INx=1, INy=0 : forward
+ *    INx=0, INy=1 : backward
+ *    INx=0, INy=0 : stop motors
+ */
+void Motor_Forward(uint8_t speed)
+{
+    Motor_SetSpeed(speed);
+    PIN_HIGH(GPIOA, IN1_PIN); PIN_LOW(GPIOA, IN2_PIN);  /* Left  → fwd */
+    PIN_HIGH(GPIOA, IN3_PIN); PIN_LOW(GPIOB, IN4_PIN);  /* Right → fwd */
+}
+
+void Motor_Backward(uint8_t speed)
+{
+    Motor_SetSpeed(speed);
+    PIN_LOW(GPIOA, IN1_PIN); PIN_HIGH(GPIOA, IN2_PIN);  /* Left  → bwd */
+    PIN_LOW(GPIOA, IN3_PIN); PIN_HIGH(GPIOB, IN4_PIN);  /* Right → bwd */
+}
+
+void Motor_TurnLeft(uint8_t speed)
+{
+    Motor_SetSpeed(speed);
+    PIN_LOW(GPIOA, IN1_PIN);  PIN_HIGH(GPIOA, IN2_PIN); /* Left  → bwd */
+    PIN_HIGH(GPIOA, IN3_PIN); PIN_LOW(GPIOB, IN4_PIN);  /* Right → fwd */
+}
+
+void Motor_TurnRight(uint8_t speed)
+{
+    Motor_SetSpeed(speed);
+    PIN_HIGH(GPIOA, IN1_PIN); PIN_LOW(GPIOA, IN2_PIN);  /* Left  → fwd */
+    PIN_LOW(GPIOA, IN3_PIN);  PIN_HIGH(GPIOB, IN4_PIN); /* Right → bwd */
+}
+
+void Motor_Stop(void)
+{
+    /* Set CCR to 0 first to avoid a brief full-speed glitch
+     * before the direction pins reach LOW state */
+    TIM3->CCR1 = 0U;
+    TIM3->CCR2 = 0U;
+    PIN_LOW(GPIOA, IN1_PIN);
+    PIN_LOW(GPIOA, IN2_PIN);
+    PIN_LOW(GPIOA, IN3_PIN);
+    PIN_LOW(GPIOB, IN4_PIN);
+}
