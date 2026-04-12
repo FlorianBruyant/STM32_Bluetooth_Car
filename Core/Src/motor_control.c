@@ -70,6 +70,9 @@ void Motor_Init(void)
 
     // Start the timer
     TIM3->CR1 |= TIM_CR1_ARPE | TIM_CR1_CEN;
+
+    // Set all direction pins LOW (initial state)
+    Motor_Stop();
 }
 
 void Motor_SetSpeedLeft(uint8_t speed)
@@ -87,4 +90,21 @@ void Motor_SetSpeed(uint8_t speed)
     uint32_t ccr = percent_to_ccr(speed);
     TIM3->CCR1 = ccr;
     TIM3->CCR2 = ccr;
+}
+
+/**
+ *  L298N logic :
+ *    INx=1, INy=0 : forward
+ *    INx=0, INy=1 : backward
+ *    INx=0, INy=0 : stop motors
+ */
+void Motor_Forward(uint8_t speed)
+{
+    Motor_SetSpeed(speed);
+    // Set left to forward
+    GPIO_WritePin(GPIOA, IN1_PIN, GPIO_PIN_SET);
+    GPIO_WritePin(GPIOA, IN2_PIN, GPIO_PIN_RESET);
+    // Set right to forward
+    GPIO_WritePin(GPIOA, IN3_PIN, GPIO_PIN_SET);
+    GPIO_WritePin(GPIOB, IN4_PIN, GPIO_PIN_RESET);
 }
