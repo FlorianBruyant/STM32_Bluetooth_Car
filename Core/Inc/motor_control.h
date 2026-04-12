@@ -7,7 +7,7 @@
 #define MOTOR_CONTROL_H_
 
 #include <stdint.h>
-#include "../Drivers/Device/Inc/gpio.h"
+#include "../../Drivers/Device/Inc/gpio.h"
 
 /**
  * TODO: Right now the PWM frequency is set to 1 kHz
