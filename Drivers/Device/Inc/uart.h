@@ -7,6 +7,8 @@
 
 #define UART_RX_BUFFER_SIZE 64U
 #define UART_TX_BUFFER_SIZE 64U
+#define BAUDRATE 9600U
+#define PCLK2 16000000U
 
 /**
  * @brief  Initializes USART1 at 9600 baud (assuming 16MHz APB2 clock).
@@ -29,6 +31,9 @@ uint8_t UART_Read(uint8_t* data);
  * @return 1U if the byte was successfully added to the buffer, 0U if the buffer is full.
  */
 uint8_t UART_SendByte(uint8_t byte);
+
+//TODO:Comment sendhex
+void UART_SendHex(uint8_t val);
 
 /**
  * @brief  Sends a null-terminated string via UART.

@@ -34,7 +34,7 @@ void UART_Init(void){
 	GPIO_Init(GPIOA, 10U, GPIO_MODE_ALTERNATE, GPIO_OTYPE_PUSHPULL, GPIO_SPEED_FAST, GPIO_PULL_NONE);
 	GPIO_SelectAltFunc(GPIOA, 10U, GPIO_AF_USART1);
 
-	USART1->BRR = 1667U; // Value that sets baud rate to 9600 at input frequency of 16 MHz
+	USART1->BRR = (PCLK2 + (BAUDRATE / 2U)) / BAUDRATE;
 
 	USART1->CR1 |= USART_CR1_TE      // Transmitter enable
 				|  USART_CR1_RE      // Receiver enable
@@ -101,6 +101,15 @@ uint8_t UART_SendByte(uint8_t byte)
     USART1->CR1 |= USART_CR1_TXEIE;
 
     return 1U;
+}
+
+void UART_SendHex(uint8_t val)
+{
+    const char hex[] = "0123456789ABCDEF";
+    UART_SendByte('0');
+    UART_SendByte('x');
+    UART_SendByte(hex[val >> 4U]);
+    UART_SendByte(hex[val & 0x0FU]);
 }
 
 void UART_SendString(const char *str)
