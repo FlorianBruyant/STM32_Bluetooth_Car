@@ -17,11 +17,14 @@
  */
 
 #include <stdint.h>
+#include <string.h>
 #include "stm32f411xe.h"
 #include "motor_control.h"
 #include "uart.h"
 #include "protocol.h"
 #include "timer.h"
+#include "i2c.h"
+#include "vl53l0x_api.h"
 
 /* Configuration */
 
@@ -36,12 +39,14 @@
 
 uint32_t SystemCoreClock = 16000000U;
 
+// Flag to stop forward movement if an obstacle is here
+volatile uint8_t obstacle_front = 0U;
+
 /**
- *  Watchdog
+ * Watchdog
  *
- *  Called every main loop iteration.
- *  Stops the motors if no valid command has been received
- *  within WATCHDOG_MS milliseconds.
+ * Stops the motors if no valid command has been received
+ * within WATCHDOG_MS milliseconds.
  */
 static void watchdog_check(uint32_t last_cmd_tick)
 {
@@ -54,33 +59,35 @@ static void watchdog_check(uint32_t last_cmd_tick)
 int main(void)
 {
     /* Initialize peripherals */
-	timer_Init();
+    timer_Init();
     motor_Init();
     UART_Init();
+
+    I2C_Init();
+
+    tof_init_protocol();  // Full VL53L0X init + diagnostic
 
     /* Safe initial state */
     motor_Stop();
 
-    /* Brief delay to let HC-05 finish its startup sequence
-     * (HC-05 takes ~300ms to initialize after power-on) */
-    timer_DelayMs(500U);
+    /* HC-05 startup delay  */
+    timer_DelayMs(300U);
 
-    /* Send startup message — visible in a serial terminal app */
     UART_SendString("CAR READY\r\n");
     UART_SendString("Protocol: DIR(F/B/L/R/S) + SPEED(00-99)\r\n");
     UART_SendString("Example : F75 = Forward 75%\r\n");
 
-    /* Watchdog timestamp — initialized to now so the car does
-     * not stop immediately before the first command arrives */
     uint32_t last_cmd_tick = timer_GetTick();
 
-    /* Main loop */
     while (1)
     {
-        /* 1. Process all pending bytes from the RX buffer */
+        /* Read distance sensor */
+        check_obstacle();
+
+        /* Process pending bytes from RX buffer */
         protocol_ProcessRx(&last_cmd_tick);
 
-        /* 2. Check watchdog */
+        /* Watchdog */
         watchdog_check(last_cmd_tick);
     }
 }
