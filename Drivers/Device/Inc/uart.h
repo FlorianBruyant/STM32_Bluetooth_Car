@@ -32,7 +32,10 @@ uint8_t UART_Read(uint8_t* data);
  */
 uint8_t UART_SendByte(uint8_t byte);
 
-//TODO:Comment sendhex
+/**
+ * @brief  Sends a number in hexadecimal value
+ * @param  val: The value to be sent
+ */
 void UART_SendHex(uint8_t val);
 
 /**
